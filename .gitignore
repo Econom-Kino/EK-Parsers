@@ -200,3 +200,6 @@ fabric.properties
 
 # MacOS 
 .DS_Store
+
+# Secret files
+keys.py

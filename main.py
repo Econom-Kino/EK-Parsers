@@ -1,10 +1,8 @@
 # Made by EK-Team
 
-import requests
-
 
 def main():
-    print('EK-Parsers')
+    pass
 
 
 if __name__ == '__main__':

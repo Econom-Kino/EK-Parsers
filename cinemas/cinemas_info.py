@@ -33,19 +33,22 @@ def get_cinema_info(request_type, place_id):
         print('Wrong type')
 
 
+# Функція оновлює інфу кінотеатрів
+# @param: place_ids - список кінотеатрів
 def update_cinemas_info(place_ids):
     for place_id in place_ids:
         cinema_request = EK_CINEMAS_API + place_id + '/'
-        get = requests.get(cinema_request)
+        cinema = requests.get(cinema_request)
 
         # Перавіряю чи є кінотеатр в базі
         # Якщо є (status_code == 200), то оновлюю інформацію (PUT)
         # Якщо немає (status_code == 404), то додаю новий кінотеатр (POST)
-        if get.status_code == 200:
+        if cinema.status_code == 200:
             put = requests.put(cinema_request, data=get_cinema_info(request_type='PUT', place_id=place_id))
-            print('Cinema PUT request:', put.status_code)
-        elif get.status_code == 404:
+            print(cinema.json()['name'] + ': Cinema Info PUT request:', put.status_code)
+        elif cinema.status_code == 404:
             post = requests.post(EK_CINEMAS_API, data=get_cinema_info(request_type='POST', place_id=place_id))
-            print('Cinema POST request:', post.status_code)
+            print('Cinema info POST request:', post.status_code)
         else:
-            print("Something goes ne tak")
+            print("update_cinemas_info: Something goes ne tak")
+    print()

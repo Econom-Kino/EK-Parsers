@@ -37,7 +37,7 @@ def get_cinema_info(request_type, place_id):
 # @param: place_ids - список кінотеатрів
 def update_cinemas_info(place_ids):
     for place_id in place_ids:
-        cinema_request = EK_CINEMAS_API + place_id + '/'
+        cinema_request = EK_CINEMAS_API + 'place_id/' + place_id + '/'
         cinema = requests.get(cinema_request)
 
         # Перавіряю чи є кінотеатр в базі

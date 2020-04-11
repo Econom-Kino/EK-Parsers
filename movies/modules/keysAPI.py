@@ -1,4 +1,0 @@
-
-OMDB_KEY = '66fffc24'
-
-TMDB_KEY = '85d3afa0695f37bbc96bb444d0fa8582'

@@ -89,7 +89,10 @@ for i in range(1, nums_of_pages + 1):
         loc_dict['trailer_link'] = trailer
 
         # poster url
-        loc_dict['poster_link'] = path_before + film['poster_path']
+        try:
+            loc_dict['poster_link'] = path_before + film['poster_path']
+        except:
+            loc_dict['poster_link'] = None
 
         list_of_genres = film['genres']
         # list of genres
@@ -104,16 +107,18 @@ for i in range(1, nums_of_pages + 1):
 
         # id for imdb api
         loc_dict['imdb_id'] = film['imdb_id']
-
         # ------
         # rating
-        list_of_ratings = requests.get('http://www.omdbapi.com/?i=' + film['imdb_id'] + '&apikey=' + OMDB_KEY).json()[
-            'Ratings']
-        rating = ''
-        for rat in list_of_ratings:
-            rating += rat['Source'] + ' ' + rat['Value'] + ' '
-        # rating = requests.get()
-        loc_dict['rating'] = rating
+        try:
+            list_of_ratings = requests.get('http://www.omdbapi.com/?i=' + film['imdb_id'] + '&apikey=' + OMDB_KEY).json()['Ratings']
+            rating = ''
+            for rat in list_of_ratings:
+                rating += rat['Source'] + ' ' + rat['Value'] + ' '
+            # rating = requests.get()
+            loc_dict['rating'] = rating
+        except:
+            loc_dict['rating'] = None
+
 
         # duration of film
         loc_dict['duration'] = int(film['runtime'])
@@ -194,9 +199,10 @@ for i in range(1, nums_of_pages + 1):
         # loc_dict['status']= film['status']
 
         print(loc_dict)
-        r = requests.post('http://127.0.0.1:8000/movies/', json=loc_dict)
-        print(r)
-        break
+
+        # r = requests.post('http://127.0.0.1:8000/movies/', json=loc_dict)
+        # print(r)
+
 
         kilkist_filmiv += 1
 

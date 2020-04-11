@@ -4,7 +4,9 @@ from keys import GOOGLE_API_KEY
 from const import EK_CINEMA_IMAGES_API, CINEMA_PHOTOS_API, CINEMA_DETAILS_API
 
 
-# POST запит до EK API для додавання нових фото
+# POST request EK API to add new photos
+# @param: img_to_post - set with photo links that must be posted
+# @param: place_id - unique cinema key
 def post_cinema_photos(img_to_post, place_id):
     for img in img_to_post:
         data = {
@@ -16,6 +18,9 @@ def post_cinema_photos(img_to_post, place_id):
     print()
 
 
+# Func deletes cinema photos in our db
+# @param: num_to_delete - number of photos that must be deleted
+# @param: place_id - unique cinema key
 def delete_local_cinema_photos(num_to_delete, place_id):
     local_cinema_photos_request = EK_CINEMA_IMAGES_API + 'cinema/' + place_id + '/'
 
@@ -29,7 +34,8 @@ def delete_local_cinema_photos(num_to_delete, place_id):
         print("delete_local_cinema_photos: ", delete)
 
 
-# Функція повертає сет з силками на фото кінотеатрів, що є у нашій базі
+# Func returns set with photo links that exist in our db
+# @param: place_id - unique cinema key
 def get_local_cinema_photos(place_id):
     local_cinema_photos = set()
     local_cinema_photos_request = EK_CINEMA_IMAGES_API + 'cinema/' + place_id + '/'
@@ -40,8 +46,8 @@ def get_local_cinema_photos(place_id):
     return local_cinema_photos
 
 
-# Функція повертає сет з силками на фото кінотеатру
-# @param: photo_references ключі фіотографій в GOOGLE API, за допомогою яких можна отримати посилання на самі фото
+# Func returns set with photo links of cinema
+# @param: photo_references - photo keys in GOOGLE API, by which will retrieve photo links
 def get_cinema_photos(photo_references):
     parsed_photos = set()
 
@@ -56,11 +62,11 @@ def get_cinema_photos(photo_references):
     return parsed_photos
 
 
-# Функція оновлює фото кінотеатрів
-# @param: place_ids - список кінотеатрів
+# Func refresh cinema images
+# @param: place_ids - unique cinema keys list
 def update_cinema_images(place_ids):
     for place_id in place_ids:
-        # GET запит до  GOOGLE API для отроимання ключів фотографій (photo_references)
+        # GET request to  GOOGLE API to retrieve photo keys (photo_references)
         photo_references_request = CINEMA_DETAILS_API + 'place_id=' + place_id + '&fields=photos&key=' + GOOGLE_API_KEY
         photo_references = requests.get(photo_references_request).json()['result']['photos']
 

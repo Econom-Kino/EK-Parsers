@@ -1,8 +1,9 @@
 from time import perf_counter
 
+from keys import TMDB_KEY, OMDB_KEY
+
 start = perf_counter()
 
-from modules.keysAPI import *
 import requests
 
 # global_list= []
@@ -42,7 +43,7 @@ print()
 '''
 
 pageuk = requests.get(
-    'https://api.themoviedb.org/3/movie/now_playing?api_key=' + TMDB_KEY + '&language=uk-UA&page=1&region=UA')
+    'https://api.themoviedb.org/3/movie/now_playing?api_key=' +  TMDB_KEY + '&language=uk-UA&page=1&region=UA')
 
 # transform request to json format
 pageuk = pageuk.json()

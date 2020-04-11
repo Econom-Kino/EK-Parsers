@@ -133,6 +133,7 @@ dmypy.json
 
 # User-specific stuff
 .idea
+.idea/
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -207,3 +208,5 @@ fabric.properties
 
 # Secret files
 keys.py
+.idea/EK-Parsers.iml
+.idea/misc.xml

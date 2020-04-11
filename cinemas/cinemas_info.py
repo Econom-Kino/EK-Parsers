@@ -2,8 +2,8 @@ import requests
 from const import CINEMA_DETAILS_REQUEST, EK_CINEMAS_API
 
 
-# Функція сформаваний словник інформацією про кінотеатр
-# @param: request_type - вказує для якого запиту (POST/PUT) протрібна інформація
+# Func return dictionary with cinema info
+# @param: request_type - for which type request (POST/PUT) need info
 def get_cinema_info(request_type, place_id):
     get_details_request = CINEMA_DETAILS_REQUEST + '&place_id=' + place_id
     request_result = requests.get(get_details_request)
@@ -33,16 +33,16 @@ def get_cinema_info(request_type, place_id):
         print('Wrong type')
 
 
-# Функція оновлює інфу кінотеатрів
-# @param: place_ids - список кінотеатрів
+# Func refresh cinema info
+# @param: place_ids - unique cinema keys list
 def update_cinemas_info(place_ids):
     for place_id in place_ids:
         cinema_request = EK_CINEMAS_API + 'place_id/' + place_id + '/'
         cinema = requests.get(cinema_request)
 
-        # Перавіряю чи є кінотеатр в базі
-        # Якщо є (status_code == 200), то оновлюю інформацію (PUT)
-        # Якщо немає (status_code == 404), то додаю новий кінотеатр (POST)
+        # Check if cinema exist in our db
+        # If exist (status_code == 200), than refresh (PUT)
+        # If not exist (status_code == 404), то додаю новий кінотеатр (POST)
         if cinema.status_code == 200:
             put = requests.put(cinema_request, data=get_cinema_info(request_type='PUT', place_id=place_id))
             print(cinema.json()['name'] + ': Cinema Info PUT request:', put.status_code)

@@ -3,7 +3,7 @@ from cinemas.cinemas_info import update_cinemas_info
 
 
 def update_cinemas():
-    # Список кінотеатрів
+    # Unique cinema keys list
     place_ids = open('cinema_place_ids.txt', 'r').read().split('\n')
 
     update_cinemas_info(place_ids)

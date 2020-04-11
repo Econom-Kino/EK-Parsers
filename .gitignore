@@ -208,3 +208,5 @@ fabric.properties
 
 # Secret files
 keys.py
+.idea/EK-Parsers.iml
+.idea/misc.xml

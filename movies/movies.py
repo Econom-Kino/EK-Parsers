@@ -15,33 +15,6 @@ dictionary = {}
 path_before = 'http://image.tmdb.org/t/p/w600_and_h900_bestv2'
 
 
-'''
-
-omdb.set_default('apikey', API_KEY)
-
-
-var =omdb.get(title='Sonic the Hedgehog')
-print(var)
-# print(var['year'])
-# response1 = requests.get('http://www.omdbapi.com/?t=Wonder%20Woman%201984&apikey=66fffc24')
-# response2 = requests.get('http://www.omdbapi.com/?s=Wonder%20Woman%201984&apikey=66fffc24')
-# print(response1.json())
-# print(response2.json())
-
-# response = requests.get('http://www.omdbapi.com/?i=tt3896198&apikey=66fffc24')
-# print(response.json())
-# all = requests.get("http://www.omdbapi.com/?s=inception&apikey=66fffc24")
-# print(all.json())
-
-
-# pag = requests.get('http://www.omdbapi.com/?page&apikey=66fffc24')
-# print(pag.json())
-
-#
-print()
-
-'''
-
 pageuk = requests.get(
     'https://api.themoviedb.org/3/movie/now_playing?api_key=' +  TMDB_KEY + '&language=uk-UA&page=1&region=UA')
 
@@ -88,11 +61,16 @@ for i in range(1, nums_of_pages + 1):
             trailer = 'https://www.google.com'
         loc_dict['trailer_link'] = trailer
 
+
+
         # poster url
         try:
             loc_dict['poster_link'] = path_before + film['poster_path']
         except:
-            loc_dict['poster_link'] = None
+            loc_dict['poster_link'] = 'https://www.google.com'
+
+
+
 
         list_of_genres = film['genres']
         # list of genres
@@ -102,51 +80,76 @@ for i in range(1, nums_of_pages + 1):
         # genres
         loc_dict['genre'] = genres
 
+
+
+
+
         # if age_limit True: 18+
         loc_dict['age'] = film['adult']
 
+
+
+
         # id for imdb api
-        loc_dict['imdb_id'] = film['imdb_id']
-        # ------
+        # loc_dict['imdb_id'] = film['imdb_id']
+        loc_dict['imdb_id'] = 'something goes ne tak'
+
+
         # rating
         try:
-            list_of_ratings = requests.get('http://www.omdbapi.com/?i=' + film['imdb_id'] + '&apikey=' + OMDB_KEY).json()['Ratings']
-            rating = ''
-            for rat in list_of_ratings:
-                rating += rat['Source'] + ' ' + rat['Value'] + ' '
-            # rating = requests.get()
-            loc_dict['rating'] = rating
+            IMDB_rating = requests.get('http://www.omdbapi.com/?i=' + film['imdb_id'] + '&apikey=' + OMDB_KEY).json()['imdbRating']
+            IMDB_rating = (float(IMDB_rating))
+            loc_dict['rating'] = IMDB_rating
         except:
-            loc_dict['rating'] = None
+            loc_dict['rating'] = 0
+
+
 
 
         # duration of film
         loc_dict['duration'] = int(film['runtime'])
 
+
+
         # release date
         loc_dict['release_date'] = film['release_date']
 
+
+
+        def get_local_actors():
+            request_local_actors = requests.get('https://ekinoback.herokuapp.com/actors/')
+            actors_list =[]
+            for actor in request_local_actors.json():
+                actors_list.append(actor['name'])
+            return actors_list
+
         # actors
         actors = []
+
         # request for info about
         act = requests.get('https://api.themoviedb.org/3/movie/' + str(
-            movie_id) + '/credits?api_key=' + TMDB_KEY + '&language=uk-UA')
-        list_actors_info = act.json()['cast']
-        for element in list_actors_info:
-            loc_dict_actors = {}
-            loc_dict_actors['character'] = element['character']
-            loc_dict_actors['name'] = element['name']
-            # check for empty path
-            try:
-                loc_dict_actors['image'] = path_before + element['profile_path']
-            except:
-                loc_dict_actors['image'] = ' '
-            actors.append(loc_dict_actors)
-        # must be this  # loc_dict['actors'] = actors
-        loc_dict['actors'] = []
+            movie_id) + '/credits?api_key=' + TMDB_KEY + '&language=uk')
 
-        # origin title
-        # loc_dict['original_title'] = film['original_title']
+        list_actors_info = act.json()['cast']
+
+        local_actors = get_local_actors()
+
+        for element in list_actors_info:
+            loc_dict_actor = {}
+
+            # loc_dict_actors['character'] = element['character']
+            loc_dict_actor['name'] = element['name']
+
+            if(element['name'] in local_actors):
+                pass
+            else:
+                local_actors.append(element['name'])
+                r= requests.post('https://ekinoback.herokuapp.com/actors/', json=loc_dict_actor)
+
+            actors.append(loc_dict_actor['name'])
+
+        loc_dict['actors'] = actors
+        # loc_dict['actors'] = []
 
         # country production
         # find all countries, and pass them to the list
@@ -155,7 +158,7 @@ for i in range(1, nums_of_pages + 1):
             list_of_countries[i] = list_of_countries[i]['name']
 
         # concatenate all the countries to one string
-        country_production = ''
+        country_production = '$'
         count = 0
         for i in range(len(list_of_countries)):
             country_production += list_of_countries[i]
@@ -178,16 +181,38 @@ for i in range(1, nums_of_pages + 1):
         # /director = ''
         loc_dict['director'] = director
 
+        def get_local_studios():
+            request_local_studios = requests.get('https://ekinoback.herokuapp.com/studios/')
+            local_studios = []
+            for studio in request_local_studios.json():
+                local_studios.append(studio['name'])
+            return local_studios
+
+
+
         # list for companies
         all_companies = []
         # get all the companies
         list_of_companies = film['production_companies']
+
+        local_companies = get_local_studios()
+
         for company in list_of_companies:
+
+            if(company['name'] in local_companies):
+                pass
+            else:
+                r = requests.post('https://ekinoback.herokuapp.com/studios/',json={"name":company['name']})
+
             all_companies.append(company['name'])
 
         # add the list to the dictionary
-        # must be this # loc_dict['studio'] = all_companies
-        loc_dict['studio'] = []
+        loc_dict['studio'] = all_companies
+        # loc_dict['studio'] = []
+
+
+
+
 
         # description
         if (film['overview'] == ''):
@@ -200,8 +225,8 @@ for i in range(1, nums_of_pages + 1):
 
         print(loc_dict)
 
-        # r = requests.post('http://127.0.0.1:8000/movies/', json=loc_dict)
-        # print(r)
+        r = requests.post('https://ekinoback.herokuapp.com/movies/', json=loc_dict)
+        print(r)
 
 
         kilkist_filmiv += 1

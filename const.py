@@ -1,4 +1,4 @@
-from keys import GOOGLE_API_KEY
+from keys import GOOGLE_API_KEY, TMDB_KEY
 
 
 # Cinemas
@@ -12,3 +12,9 @@ CINEMA_DETAILS_REQUEST = CINEMA_DETAILS_API + 'fields=' + CINEMA_DETAILS_FIELDS 
 # EK_CINEMA_IMAGES_API = 'https://ekinoback.herokuapp.com/cinema-images/'
 EK_CINEMA_IMAGES_API = 'http://127.0.0.1:8000/cinema-images/'
 CINEMA_PHOTOS_API = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=1000&photoreference='
+
+# Genres
+EK_GENRES_API = 'https://ekinoback.herokuapp.com/genres/'
+# EK_GENRES_API = 'http://127.0.0.1:8000/genres/'
+GENRES_API = 'https://api.themoviedb.org/3/genre/movie/list?'
+GENRES_REQUEST = GENRES_API + 'language=uk-UA&api_key=' + TMDB_KEY

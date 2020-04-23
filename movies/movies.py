@@ -1,35 +1,30 @@
 from time import perf_counter
 
+from const import NOW_PLAYING, UPCOMING
 from keys import TMDB_KEY, OMDB_KEY
-
-start = perf_counter()
-
 import requests
 
-# global_list= []
-dictionary = {}
-# id of film
-# id =0
+start = perf_counter()
 
 # path_before poster
 path_before = 'http://image.tmdb.org/t/p/w600_and_h900_bestv2'
 
 
-pageuk = requests.get(
-    'https://api.themoviedb.org/3/movie/now_playing?api_key=' +  TMDB_KEY + '&language=uk-UA&page=1&region=UA')
+def get_pages(link):
 
-# transform request to json format
-pageuk = pageuk.json()
+    pageuk = requests.get(link+'&page=1')
+    # transform request to json format
+    pageuk = pageuk.json()
+    # amount of pages
+    nums_of_pages = pageuk['total_pages']
+    return nums_of_pages
 
-# amount of pages
-nums_of_pages = pageuk['total_pages']
 
-kilkist_filmiv = 0
-for i in range(1, nums_of_pages + 1):
+def get_IDlist(page,link):
 
     pageuk = requests.get(
-        'https://api.themoviedb.org/3/movie/now_playing?api_key=' + TMDB_KEY + '&language=uk-UA&page=' + str(
-            i) + '&region=UA')
+        link+'&page=' + str(
+            page) + '&region=UA')
     pageuk = pageuk.json()
     # pages
     res = ((pageuk['results']))
@@ -39,230 +34,257 @@ for i in range(1, nums_of_pages + 1):
     for film_id in res:
         films_id.append(film_id['id'])
 
-    # get every film by theirs id
-    for movie_id in films_id:
-        film = requests.get('https://api.themoviedb.org/3/movie/' + str(
-            movie_id) + '?api_key=' + TMDB_KEY + '&language=uk-UA')
-
-        film = film.json()
-
-        loc_dict = {}
-
-        # title
-        loc_dict['name'] = film['title']
-
-        # trailer_link link
-        trailers_response = requests.get('https://api.themoviedb.org/3/movie/' + str(
-            movie_id) + '/videos?api_key=' + TMDB_KEY + '&language=uk-UA')
-        trailers = trailers_response.json()['results']
-        try:
-            trailer = 'https://www.youtube.com/watch?v=' + trailers[len(trailers) - 1]['key']
-        except:
-            trailer = 'https://www.google.com'
-        loc_dict['trailer_link'] = trailer
+    return films_id
 
 
-
-        # poster url
-        try:
-            loc_dict['poster_link'] = path_before + film['poster_path']
-        except:
-            loc_dict['poster_link'] = 'https://www.google.com'
+def get_title(film_object):
+    return film_object['title']
 
 
+def get_trailer(flim_object, id):
+    trailers_response = requests.get(
+        'https://api.themoviedb.org/3/movie/' + str(id) + '/videos?api_key=' + TMDB_KEY + '&language=uk-UA')
+    trailers = trailers_response.json()['results']
+    try:
+        trailer = 'https://www.youtube.com/watch?v=' + trailers[len(trailers) - 1]['key']
+    except:
+        trailer = None
+    return trailer
 
 
-        list_of_genres = film['genres']
-        # list of genres
-        genres = []
-        for gan in list_of_genres:
-            genres.append(gan['name'])
-        # genres
-        loc_dict['genre'] = genres
+def get_poster(film_object):
+    poster_link = ''
+    try:
+        poster_link = path_before + film_object['poster_path']
+    except:
+        poster_link = 'https://i.imgur.com/CPBk3g2.png'
+    return poster_link
 
 
+def get_genres(film_object):
+    list_of_genres = film_object['genres']
+    genres = []
+    for gan in list_of_genres:
+        genres.append(gan['name'])
+    return genres
 
 
-
-        # if age_limit True: 18+
-        loc_dict['age'] = film['adult']
-
+def get_AgeLimit(film_object):
+    return film_object['adult']
 
 
-
-        # id for imdb api
-        # loc_dict['imdb_id'] = film['imdb_id']
-        loc_dict['imdb_id'] = 'something goes ne tak'
-
-
-        # rating
-        try:
-            IMDB_rating = requests.get('http://www.omdbapi.com/?i=' + film['imdb_id'] + '&apikey=' + OMDB_KEY).json()['imdbRating']
-            IMDB_rating = (float(IMDB_rating))
-            loc_dict['rating'] = IMDB_rating
-        except:
-            loc_dict['rating'] = 0
-
-
-
-
-        # duration of film
-        loc_dict['duration'] = int(film['runtime'])
-
-
-
-        # release date
-        loc_dict['release_date'] = film['release_date']
-
-
-
-        def get_local_actors():
-            request_local_actors = requests.get('https://ekinoback.herokuapp.com/actors/')
-            actors_list =[]
-            for actor in request_local_actors.json():
-                actors_list.append(actor['name'])
-            return actors_list
-
-        # actors
-        actors = []
-
-        # request for info about
-        act = requests.get('https://api.themoviedb.org/3/movie/' + str(
-            movie_id) + '/credits?api_key=' + TMDB_KEY + '&language=uk')
-
-        list_actors_info = act.json()['cast']
-
-        local_actors = get_local_actors()
-
-        for element in list_actors_info:
-            loc_dict_actor = {}
-
-            # loc_dict_actors['character'] = element['character']
-            loc_dict_actor['name'] = element['name']
-
-            if(element['name'] in local_actors):
-                pass
-            else:
-                local_actors.append(element['name'])
-                r= requests.post('https://ekinoback.herokuapp.com/actors/', json=loc_dict_actor)
-
-            actors.append(loc_dict_actor['name'])
-
-        loc_dict['actors'] = actors
-        # loc_dict['actors'] = []
-
-        # country production
-        # find all countries, and pass them to the list
-        list_of_countries = film['production_countries']
-        for i in range(len(list_of_countries)):
-            list_of_countries[i] = list_of_countries[i]['name']
-
-        # concatenate all the countries to one string
-        country_production = '$'
-        count = 0
-        for i in range(len(list_of_countries)):
-            country_production += list_of_countries[i]
-            if (i != len(list_of_countries) - 1):
-                country_production += ','
-        loc_dict['country_production'] = country_production
-
-        # director
-        info_director = requests.get('https://api.themoviedb.org/3/movie/' + str(
-            movie_id) + '?api_key=' + TMDB_KEY + '&language=uk-UA&append_to_response=credits')
-        crew = info_director.json()['credits']['crew']
-        director = ''
-        for element in crew:
-            if (element['job'] == 'Director'):
-                director = element['name']
-                break
-            else:
-                director = ' '
-
-        # /director = ''
-        loc_dict['director'] = director
-
-        def get_local_studios():
-            request_local_studios = requests.get('https://ekinoback.herokuapp.com/studios/')
-            local_studios = []
-            for studio in request_local_studios.json():
-                local_studios.append(studio['name'])
-            return local_studios
-
-
-
-        # list for companies
-        all_companies = []
-        # get all the companies
-        list_of_companies = film['production_companies']
-
-        local_companies = get_local_studios()
-
-        for company in list_of_companies:
-
-            if(company['name'] in local_companies):
-                pass
-            else:
-                r = requests.post('https://ekinoback.herokuapp.com/studios/',json={"name":company['name']})
-
-            all_companies.append(company['name'])
-
-        # add the list to the dictionary
-        loc_dict['studio'] = all_companies
-        # loc_dict['studio'] = []
-
-
-
-
-
-        # description
-        if (film['overview'] == ''):
-            loc_dict['description'] = ' - '
+def get_imdbId(film_object):
+    imdbID = ''
+    try:
+        if (film_object['imdb_id'] == ''):
+            imdbID = None
         else:
-            loc_dict['description'] = film['overview']
-
-        # status if the film was released
-        # loc_dict['status']= film['status']
-
-        print(loc_dict)
-
-        r = requests.post('https://ekinoback.herokuapp.com/movies/', json=loc_dict)
-        print(r)
+            imdbID = film_object['imdb_id']
+    except:
+        imdbID = None
+    return imdbID
 
 
-        kilkist_filmiv += 1
+def get_rating(film_object):
+    rating = 0
+    try:
+        IMDB_rating = \
+        requests.get('http://www.omdbapi.com/?i=' + film_object['imdb_id'] + '&apikey=' + OMDB_KEY).json()['imdbRating']
+        IMDB_rating = (float(IMDB_rating))
+        rating = IMDB_rating
+    except:
+        rating = None
+    return rating
 
-        # dictionary[id] = loc_dict
 
-        # id+=1
+def get_duration(film_object):
+    return int(film_object['runtime'])
+
+
+def get_ReleaseDate(film_object):
+    return film_object['release_date']
+
+
+def get_local_actors():
+    request_local_actors = requests.get('https://ekinoback.herokuapp.com/actors')
+    actors_list = []
+    for actor in request_local_actors.json():
+        actors_list.append(actor['name'])
+    return actors_list
+
+
+def get_actors(id):
+    # actors
+    actors = []
+
+    # request for info about
+    act = requests.get('https://api.themoviedb.org/3/movie/' + str(
+        id) + '/credits?api_key=' + TMDB_KEY + '&language=uk')
+
+    list_actors_info = act.json()['cast']
+
+    local_actors = get_local_actors()
+
+    # take only 5 actors
+    count =0
+    for element in list_actors_info:
+        if(count==5):
+            break
+        loc_dict_actor = {}
+
+        # loc_dict_actors['character'] = element['character']
+        loc_dict_actor['name'] = element['name']
+
+        if (element['name'] not in local_actors):
+            local_actors.append(element['name'])
+            r = requests.post('https://ekinoback.herokuapp.com/actors', json=loc_dict_actor)
+
+        actors.append(loc_dict_actor['name'])
+        count+=1
+    return actors
+
+
+def get_country_production(film_object):
+    # find all countries, and pass them to the list
+    list_of_countries = film_object['production_countries']
+    for i in range(len(list_of_countries)):
+        list_of_countries[i] = list_of_countries[i]['name']
+    # concatenate all the countries to one string
+    country_production = ''
+    count = 0
+    for i in range(len(list_of_countries)):
+        country_production += list_of_countries[i]
+        if (i != len(list_of_countries) - 1):
+            country_production += ','
+    if country_production == '':
+        country_production = None
+    return country_production
+
+
+def get_director(id):
+    info_director = requests.get('https://api.themoviedb.org/3/movie/' + str(
+        id) + '?api_key=' + TMDB_KEY + '&language=uk-UA&append_to_response=credits')
+    crew = info_director.json()['credits']['crew']
+    director = ''
+    for element in crew:
+        if (element['job'] == 'Director'):
+            director = element['name']
+            break
+        else:
+            director = ' '
+    return director
+
+
+def get_local_studios():
+    request_local_studios = requests.get('https://ekinoback.herokuapp.com/studios')
+    local_studios = []
+    for studio in request_local_studios.json():
+        local_studios.append(studio['name'])
+    return local_studios
+
+
+def get_studios(film_object):
+    # list for companies
+    all_companies = []
+    # get all the companies
+    list_of_companies = film_object['production_companies']
+
+    local_companies = get_local_studios()
+
+    # take only 5 studios
+
+    for count,company in enumerate(list_of_companies):
+        if(count == 5):
+            break
+        if (company['name'] not in local_companies):
+            pass
+            r = requests.post('https://ekinoback.herokuapp.com/studios', json={"name": company['name']})
+
+        all_companies.append(company['name'])
+    return all_companies
+
+
+def get_description(film_object):
+    description = ''
+    if (film_object['overview'] == ''):
+        description = None
+    else:
+        description = film_object['overview']
+    return description
+
+
+def get_film(movie_id):
+    film = requests.get('https://api.themoviedb.org/3/movie/' + str(
+        movie_id) + '?api_key=' + TMDB_KEY + '&language=uk-UA')
+
+    film = film.json()
+
+    loc_dict = {}
+
+    # title
+    loc_dict['name'] = get_title(film)
+
+    # trailer_link
+    loc_dict['trailer_link'] = get_trailer(film, movie_id)
+
+    # poster url
+    loc_dict['poster_link'] = get_poster(film)
+
+    # genres
+    loc_dict['genre'] = get_genres(film)
+
+    # if age_limit True: 18+
+    loc_dict['age'] = get_AgeLimit(film)
+
+    # id for imdb api
+    loc_dict['imdb_id'] = get_imdbId(film)
+
+    # rating
+    loc_dict['rating'] = get_rating(film)
+
+    # duration of film
+    loc_dict['duration'] = get_duration(film)
+
+    # release date
+    loc_dict['release_date'] = get_ReleaseDate(film)
+
+    # actors
+    loc_dict['actors'] = get_actors(movie_id)
+
+    # country production
+    loc_dict['country_production'] = get_country_production(film)
+
+    # director
+    loc_dict['director'] = get_director(movie_id)
+
+    # studio
+    loc_dict['studio'] = get_studios(film)
+
+    # description
+    loc_dict['description'] = get_description(film)
+
+    return loc_dict
+
+def update_films(url):
+    # amount of pages
+    nums_of_pages = get_pages(url)
+
+    for page in range(1, nums_of_pages + 1):
+
+        # list of film's id
+        films_id = get_IDlist(page,url)
+
+        # get every film by theirs id
+        for movie_id in films_id:
+            film_dict = get_film(movie_id)
+            print(film_dict)
+
+            r = requests.post('https://ekinoback.herokuapp.com/movies', json=film_dict)
+            print(r)
+
+
+update_films(UPCOMING)
+update_films(NOW_PLAYING)
 
 finish = perf_counter()
 print(finish - start)
-print(kilkist_filmiv)
-
-# with open('films.json', 'w', encoding='utf-8') as json_file:
-#     json.dump(dictionary, json_file)
-
-# pages = omdb.get(page = )
-# print(pages)
-
-
-'''
-{
-"name": "Бладшот4345",
-"trailer_link": "https://www.youtube.com/watch?v=pWbL7f0RBFY",
-"poster_link": "http://image.tmdb.org/t/p/w600_and_h900_bestv2/fw5qiCNYdCYiPlB2xJvLEnugZNa.jpg",
-"genre" :["Бойовик", "Фантастика"],
- "age" : "True",
- "rating" : 4.2,
- "duration" : 100,
- "release_date" : "2020-03-05",
- "actors" : [],
- "country_production" : "China,United States of America",
- "director" : "me",
- "studio" : [],
- "description": "agagga"
-}'''
-
-'''
-# {'name': 'Бладшот', 'trailer_link': 'https://www.youtube.com/watch?v=pWbL7f0RBFY', 'poster_link': 'http://image.tmdb.org/t/p/w600_and_h900_bestv2/fw5qiCNYdCYiPlB2xJvLEnugZNa.jpg', 'genre': ['Бойовик', 'Фантастика'], 'age': False, 'rating': 4.2, 'duration': 110, 'release_date': '2020-03-05', 'actors': [], 'country_production': 'China,United States of America', 'director': 'Dave Wilson', 'studio': [], 'description': 'Секретна корпорація RST повертає до життя смертельно пораненого морпіха Рея Ґаррісона. Завдяки нанотехнологіям він стає Бладшотом – невразливою біотехнологічною зброєю, універсальним солдатом з надлюдською силою. Контролюючи тіло Рея, компанія керує його розумом і спогадами. Бладшот не знає, хто він насправді, і його завдання це з’ясувати.'}
-'''

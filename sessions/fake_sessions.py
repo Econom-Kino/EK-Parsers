@@ -1,7 +1,9 @@
 import datetime
 from random import randint
-
 import requests
+
+from const import EK_IN_ROLLING_API, EK_SESSIONS_API
+
 
 TECHNOLOGIES = ['2D', '3D', '4DX']
 place_ids = open('../cinemas/cinema_place_ids.txt', 'r').read().split('\n')
@@ -24,13 +26,13 @@ def generate_rand_sessions_for_movie(movie_id):
 
 
 def post_fake_sessions():
-    movies_in_rolling = requests.get('https://ekinoback.herokuapp.com/movies/inRolling/')
+    movies_in_rolling = requests.get(EK_IN_ROLLING_API)
 
     for movie in movies_in_rolling.json():
         sessions = generate_rand_sessions_for_movie(movie['id'])
         for session in sessions:
             print(session)
-            post = requests.post('https://ekinoback.herokuapp.com/sessions/', data=session)
+            post = requests.post(EK_SESSIONS_API, data=session)
             print(post)
 
 

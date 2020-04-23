@@ -1,7 +1,7 @@
 import requests
 
 from keys import GOOGLE_API_KEY
-from const import EK_CINEMA_IMAGES_API, CINEMA_PHOTOS_API, CINEMA_DETAILS_API
+from const import EK_CINEMA_IMAGES_API, CINEMA_PHOTOS_API, CINEMA_DETAILS_API, EK_CINEMAS_API
 
 
 # POST request EK API to add new photos
@@ -22,13 +22,13 @@ def post_cinema_photos(img_to_post, place_id):
 # @param: num_to_delete - number of photos that must be deleted
 # @param: place_id - unique cinema key
 def delete_local_cinema_photos(num_to_delete, place_id):
-    local_cinema_photos_request = EK_CINEMA_IMAGES_API + 'cinema/' + place_id + '/'
+    local_cinema_photos_request = EK_CINEMAS_API + '/' + place_id + '/cinema-images'
 
     for count, photo in enumerate(requests.get(local_cinema_photos_request).json()):
         if count == num_to_delete:
             break
 
-        photo_to_del_request = EK_CINEMA_IMAGES_API + 'id/' + str(photo['id']) + '/'
+        photo_to_del_request = EK_CINEMA_IMAGES_API + '/' + str(photo['id'])
         delete = requests.delete(photo_to_del_request)
 
         print("delete_local_cinema_photos: ", delete)
@@ -38,7 +38,7 @@ def delete_local_cinema_photos(num_to_delete, place_id):
 # @param: place_id - unique cinema key
 def get_local_cinema_photos(place_id):
     local_cinema_photos = set()
-    local_cinema_photos_request = EK_CINEMA_IMAGES_API + 'cinema/' + place_id + '/'
+    local_cinema_photos_request = EK_CINEMAS_API + '/' + place_id + '/cinema-images'
 
     for photo in requests.get(local_cinema_photos_request).json():
         local_cinema_photos.add(photo['image_link'])

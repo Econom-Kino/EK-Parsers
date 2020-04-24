@@ -9,9 +9,10 @@ TECHNOLOGIES = ['2D', '3D', '4DX']
 place_ids = open('../cinemas/cinema_place_ids.txt', 'r').read().split('\n')
 
 
-def generate_rand_sessions_for_movie(movie_id):
+# day_from: 0 - today, 1 - tomorrow
+def generate_rand_sessions_for_movie(movie_id, day_from, num_of_days):
     sessions = []
-    for day in range(7):
+    for day in range(day_from, day_from+num_of_days):
         for _ in range(randint(10, 15)):
             sessions.append({
                 'cinema': place_ids[randint(0, 5)],
@@ -25,11 +26,11 @@ def generate_rand_sessions_for_movie(movie_id):
     return sessions
 
 
-def post_fake_sessions():
+def post_fake_sessions(day_from, num_of_days):
     movies_in_rolling = requests.get(EK_IN_ROLLING_API)
 
     for movie in movies_in_rolling.json():
-        sessions = generate_rand_sessions_for_movie(movie['id'])
+        sessions = generate_rand_sessions_for_movie(movie['id'], day_from, num_of_days)
         for session in sessions:
             print(session)
             post = requests.post(EK_SESSIONS_API, data=session)
@@ -37,4 +38,4 @@ def post_fake_sessions():
 
 
 if __name__ == '__main__':
-    post_fake_sessions()
+    post_fake_sessions(day_from=1, num_of_days=7)

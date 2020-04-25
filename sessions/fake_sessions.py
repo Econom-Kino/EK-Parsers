@@ -1,6 +1,7 @@
 import datetime
-from random import randint
+import time
 import requests
+from random import randint
 
 from const import EK_IN_ROLLING_API, EK_SESSIONS_API
 
@@ -26,7 +27,19 @@ def generate_rand_sessions_for_movie(movie_id, day_from, num_of_days):
     return sessions
 
 
-def post_fake_sessions(day_from, num_of_days):
+def post_fake_sessions(adding_type):
+    day_from: int
+    num_of_days: int
+
+    if adding_type == "week":
+        day_from = 0
+        num_of_days = 7
+    elif adding_type == "day":
+        day_from = 6
+        num_of_days = 1
+    else:
+        print("post_fake_sessions: wrong adding_type")
+
     movies_in_rolling = requests.get(EK_IN_ROLLING_API)
 
     for movie in movies_in_rolling.json():
@@ -40,4 +53,8 @@ def post_fake_sessions(day_from, num_of_days):
 
 
 if __name__ == '__main__':
-    post_fake_sessions(day_from=0, num_of_days=7)
+    start_time = time.time()
+
+    post_fake_sessions(adding_type="week")
+
+    print("Script worked %s seconds" % (time.time() - start_time))

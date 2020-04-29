@@ -9,7 +9,7 @@ def update_genres():
         tmdb_genres = requests.get(GENRES_REQUEST).json()
 
         for genre in tmdb_genres['genres']:
-            local_genre_request = EK_GENRES_API + 'id/' + str(genre['id']) + '/'
+            local_genre_request = EK_GENRES_API + '/' + str(genre['id'])
 
             try:
                 local_genre = requests.get(local_genre_request)

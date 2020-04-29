@@ -273,6 +273,7 @@ def update_films(url):
 
         # list of film's id
         films_id = get_IDlist(page,url)
+        print(films_id)
 
         # get every film by theirs id
         for movie_id in films_id:
@@ -284,7 +285,7 @@ def update_films(url):
 
 
 update_films(UPCOMING)
-update_films(NOW_PLAYING)
+# update_films(NOW_PLAYING)
 
 finish = perf_counter()
 print(finish - start)

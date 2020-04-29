@@ -133,7 +133,10 @@ dmypy.json
 
 # User-specific stuff
 .idea
+<<<<<<< HEAD
+=======
 .idea/
+>>>>>>> ce66c225d2aec10ce36976b7440bf62747a087d6
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml

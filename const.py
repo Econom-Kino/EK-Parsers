@@ -12,7 +12,7 @@ EK_CINEMA_IMAGES_API = 'https://ekinoback.herokuapp.com/cinema-images'
 CINEMA_PHOTOS_API = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=1000&photoreference='
 
 
-# films
+# Films
 NOW_PLAYING = 'https://api.themoviedb.org/3/movie/now_playing?api_key=' + TMDB_KEY + '&language=uk-UA&region=UA'
 UPCOMING = 'https://api.themoviedb.org/3/movie/upcoming?api_key=' + TMDB_KEY + '&language=uk-UA&region=UA'
 

@@ -7,7 +7,7 @@ from const import EK_IN_ROLLING_API, EK_SESSIONS_API
 
 
 TECHNOLOGIES = ['2D', '3D', '4DX']
-place_ids = open('../cinemas/cinema_place_ids.txt', 'r').read().split('\n')
+place_ids = open('cinemas/cinema_place_ids.txt', 'r').read().split('\n')
 
 
 # day_from: 0 - today, 1 - tomorrow
@@ -33,7 +33,7 @@ def post_fake_sessions(adding_type):
 
     if adding_type == "week":
         day_from = 0
-        num_of_days = 7
+        num_of_days = 6
     elif adding_type == "day":
         day_from = 6
         num_of_days = 1
@@ -50,11 +50,3 @@ def post_fake_sessions(adding_type):
         post = requests.post(EK_SESSIONS_API, json=sessions)
         print(post)
         print()
-
-
-if __name__ == '__main__':
-    start_time = time.time()
-
-    post_fake_sessions(adding_type="week")
-
-    print("Script worked %s seconds" % (time.time() - start_time))

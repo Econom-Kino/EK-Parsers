@@ -1,10 +1,6 @@
-from time import perf_counter
-
-from const import NOW_PLAYING, UPCOMING
 from keys import TMDB_KEY, OMDB_KEY
 import requests
 
-start = perf_counter()
 
 # path_before poster
 path_before = 'http://image.tmdb.org/t/p/w600_and_h900_bestv2'
@@ -93,7 +89,7 @@ def get_rating(film_object):
         IMDB_rating = (float(IMDB_rating))
         rating = IMDB_rating
     except:
-        rating = None
+        rating = 0
     return rating
 
 
@@ -116,6 +112,7 @@ def get_local_actors():
 def get_actors(id):
     # actors
     actors = []
+    actors_to_post = []
 
     # request for info about
     act = requests.get('https://api.themoviedb.org/3/movie/' + str(
@@ -137,7 +134,7 @@ def get_actors(id):
 
         if (element['name'] not in local_actors):
             local_actors.append(element['name'])
-            r = requests.post('https://ekinoback.herokuapp.com/actors', json=loc_dict_actor)
+            r = requests.post('https://ekinoback.herokuapp.com/actors', json=[loc_dict_actor])
 
         actors.append(loc_dict_actor['name'])
         count+=1
@@ -186,27 +183,28 @@ def get_local_studios():
 def get_studios(film_object):
     # list for companies
     all_companies = []
+
     # get all the companies
     list_of_companies = film_object['production_companies']
 
     local_companies = get_local_studios()
 
-    # take only 5 studios
 
-    for count,company in enumerate(list_of_companies):
+
+    for count, company in enumerate(list_of_companies):
+        # take only 5 studios
         if(count == 5):
             break
         if (company['name'] not in local_companies):
-            pass
-            r = requests.post('https://ekinoback.herokuapp.com/studios', json={"name": company['name']})
-
+            r = requests.post('https://ekinoback.herokuapp.com/studios', json=[{"name": company['name']}])
         all_companies.append(company['name'])
+
     return all_companies
 
 
 def get_description(film_object):
     description = ''
-    if (film_object['overview'] == ''):
+    if film_object['overview'] == '':
         description = None
     else:
         description = film_object['overview']
@@ -222,70 +220,63 @@ def get_film(movie_id):
     loc_dict = {}
 
     # title
-    loc_dict['name'] = get_title(film)
+    loc_dict["name"] = get_title(film)
 
     # trailer_link
-    loc_dict['trailer_link'] = get_trailer(film, movie_id)
+    loc_dict["trailer_link"] = get_trailer(film, movie_id)
 
     # poster url
-    loc_dict['poster_link'] = get_poster(film)
+    loc_dict["poster_link"] = get_poster(film)
 
     # genres
-    loc_dict['genre'] = get_genres(film)
+    loc_dict["genre"] = get_genres(film)
 
     # if age_limit True: 18+
-    loc_dict['age'] = get_AgeLimit(film)
+    loc_dict["age"] = get_AgeLimit(film)
 
     # id for imdb api
-    loc_dict['imdb_id'] = get_imdbId(film)
+    loc_dict["imdb_id"] = get_imdbId(film)
 
     # rating
-    loc_dict['rating'] = get_rating(film)
+    loc_dict["rating"] = get_rating(film)
 
     # duration of film
-    loc_dict['duration'] = get_duration(film)
+    loc_dict["duration"] = get_duration(film)
 
     # release date
-    loc_dict['release_date'] = get_ReleaseDate(film)
+    loc_dict["release_date"] = get_ReleaseDate(film)
 
     # actors
-    loc_dict['actors'] = get_actors(movie_id)
+    loc_dict["actors"] = get_actors(movie_id)
 
     # country production
-    loc_dict['country_production'] = get_country_production(film)
+    loc_dict["country_production"] = get_country_production(film)
 
     # director
-    loc_dict['director'] = get_director(movie_id)
+    loc_dict["director"] = get_director(movie_id)
 
     # studio
-    loc_dict['studio'] = get_studios(film)
+    loc_dict["studio"] = get_studios(film)
 
     # description
-    loc_dict['description'] = get_description(film)
+    loc_dict["description"] = get_description(film)
 
     return loc_dict
+
 
 def update_films(url):
     # amount of pages
     nums_of_pages = get_pages(url)
+    movies_to_post = []
 
     for page in range(1, nums_of_pages + 1):
 
         # list of film's id
-        films_id = get_IDlist(page,url)
-        print(films_id)
+        films_id = get_IDlist(page, url)
 
         # get every film by theirs id
         for movie_id in films_id:
             film_dict = get_film(movie_id)
             print(film_dict)
-
-            r = requests.post('https://ekinoback.herokuapp.com/movies', json=film_dict)
+            r = requests.post('https://ekinoback.herokuapp.com/movies', json=[film_dict])
             print(r)
-
-
-update_films(UPCOMING)
-# update_films(NOW_PLAYING)
-
-finish = perf_counter()
-print(finish - start)

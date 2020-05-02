@@ -270,18 +270,17 @@ def update_films(url):
     nums_of_pages = get_pages(url)
 
     for page in range(1, nums_of_pages + 1):
-
+        list_to_post = []
         # list of film's id
         films_id = get_IDlist(page,url)
-        print(films_id)
 
         # get every film by theirs id
         for movie_id in films_id:
             film_dict = get_film(movie_id)
             print(film_dict)
-
-            r = requests.post('https://ekinoback.herokuapp.com/movies', json=film_dict)
-            print(r)
+            list_to_post.append(film_dict)
+        r = requests.post('https://ekinoback.herokuapp.com/movies', json=list_to_post)
+        print(r)
 
 
 update_films(UPCOMING)

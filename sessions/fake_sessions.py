@@ -7,7 +7,12 @@ from const import EK_IN_ROLLING_API, EK_SESSIONS_API
 
 
 TECHNOLOGIES = ['2D', '3D', '4DX']
-place_ids = open('cinemas/cinema_place_ids.txt', 'r').read().split('\n')
+place_ids = ["ChIJl3xz8QnnOkcReSOln9d6RqY",
+             "ChIJ4dGDScndOkcRK6iYsuY5rCk",
+             "ChIJif8CqgvdOkcRxDok8ta8w7Y",
+             "ChIJG3CADybmOkcRkBn2_jOgbyA",
+             "ChIJjW4PlXLdOkcRH4w0juRF9Ww",
+             "ChIJ3X6gOm3oOkcRirf_eSmxXSI"]
 
 
 # day_from: 0 - today, 1 - tomorrow

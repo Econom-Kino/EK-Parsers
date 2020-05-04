@@ -2,10 +2,14 @@
 from cinemas.update_cinemas import update_cinemas
 from genres.update_genres import update_genres
 from movies.update_movies import update_movies
+from sessions.clear_sessions import clear_sessions
 from sessions.fake_sessions import post_fake_sessions
 
 
 def main():
+    # Clear useless data
+    clear_sessions()
+
     # Cinemas
     update_cinemas()
 

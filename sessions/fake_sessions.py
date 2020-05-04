@@ -31,7 +31,7 @@ def post_fake_sessions(adding_type):
 
     if adding_type == "week":
         day_from = 0
-        num_of_days = 6
+        num_of_days = 7
     elif adding_type == "day":
         day_from = 7
         num_of_days = 1

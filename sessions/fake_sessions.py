@@ -17,7 +17,7 @@ def generate_rand_sessions_for_movie(movie_id, day_from, num_of_days):
                 "cinema": PLACE_IDs[randint(0, 5)],
                 "movie": movie_id,
                 "price": randint(10, 25) * 5,
-                "start_time": str(datetime.date.today() + datetime.timedelta(days=day)) + "T" + str(randint(8, 23)) + ":00:00+03:00",
+                "start_time": str(datetime.date.today() + datetime.timedelta(days=day)) + "T" + str(randint(10, 23)) + ":00:00+03:00",
                 "ticket_link": "https://www.google.com",
                 "language": "Українська",
                 "technology": TECHNOLOGIES[randint(0, 2)]

@@ -19,7 +19,7 @@ def get_cinema_info(request_type, place_id):
             "website_link": request_result.json()['result']['website']
         }
     elif request_type == 'POST':
-        return {
+        return [{
             "name": request_result.json()['result']['name'],
             "address": request_result.json()['result']['formatted_address'],
             "rating": request_result.json()['result']['rating'],
@@ -28,7 +28,7 @@ def get_cinema_info(request_type, place_id):
             "latitude": request_result.json()['result']['geometry']['location']['lat'],
             "website_link": request_result.json()['result']['website'],
             "phone": request_result.json()['result']['formatted_phone_number']
-        }
+        }]
     else:
         print('Wrong type')
 
@@ -42,13 +42,11 @@ def update_cinemas_info(place_ids):
 
         # Check if cinema exist in our db
         # If exist (status_code == 200), than refresh (PUT)
-        # If not exist (status_code == 404), то додаю новий кінотеатр (POST)
+        # If not exist, add new cinema (POST)
         if cinema.status_code == 200:
             put = requests.put(cinema_request, data=get_cinema_info(request_type='PUT', place_id=place_id))
-            print(cinema.json()['name'] + ': Cinema Info PUT request:', put.status_code)
-        elif cinema.status_code == 404:
-            post = requests.post(EK_CINEMAS_API, data=get_cinema_info(request_type='POST', place_id=place_id))
-            print('Cinema info POST request:', post.status_code)
+            print(cinema.json()['name'] + ': Cinema Info PUT request:', put.status_code, put.json())
         else:
-            print("update_cinemas_info: Something goes ne tak")
+            post = requests.post(EK_CINEMAS_API, json=get_cinema_info(request_type='POST', place_id=place_id))
+            print('Cinema info POST request:', post.status_code, post.json())
     print()

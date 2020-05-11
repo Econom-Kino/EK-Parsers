@@ -9,12 +9,12 @@ from const import EK_CINEMA_IMAGES_API, CINEMA_PHOTOS_API, CINEMA_DETAILS_API, E
 # @param: place_id - unique cinema key
 def post_cinema_photos(img_to_post, place_id):
     for img in img_to_post:
-        data = {
+        data = [{
             'cinema': place_id,
             'image_link': img
-        }
-        post = requests.post(EK_CINEMA_IMAGES_API, data=data)
-        print('Images POST request:', post.status_code)
+        }]
+        post = requests.post(EK_CINEMA_IMAGES_API, json=data)
+        print('Images POST request:', post.status_code, post.json())
     print()
 
 

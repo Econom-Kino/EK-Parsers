@@ -27,6 +27,8 @@ GENRES_REQUEST = GENRES_API + 'language=uk-UA&api_key=' + TMDB_KEY
 EK_SESSIONS_API = 'https://ekinoback.herokuapp.com/sessions'
 EK_IN_ROLLING_API = 'https://ekinoback.herokuapp.com/movies/in-rolling'
 EK_CLEAR_SESSIONS = 'https://ekinoback.herokuapp.com/clear/sessions'
+EK_MOVIES = 'https://ekinoback.herokuapp.com/movies'
+EK_ANNOUNCES = 'https://ekinoback.herokuapp.com/movies/announces'
 
 
 # Unique cinema keys list
